@@ -1,5 +1,4 @@
 import { MemoryBankAccountRepository } from "../../repository/MemoryBankAccountRepository";
-import { MockBankAccountRepository } from "../../repository/MockBankAccountRepository";
 import {
   BankAccountService,
   BankAccountServiceImpl,
@@ -45,7 +44,7 @@ describe("BankAccountService > deposit ", () => {
 
   beforeEach(() => {
     bankAccountService = new BankAccountServiceImpl(
-      new MockBankAccountRepository()
+      new MemoryBankAccountRepository()
     );
   });
 
@@ -70,7 +69,7 @@ describe("BankAccountService > withdrawal ", () => {
 
   beforeEach(() => {
     bankAccountService = new BankAccountServiceImpl(
-      new MockBankAccountRepository()
+      new MemoryBankAccountRepository()
     );
   });
 
