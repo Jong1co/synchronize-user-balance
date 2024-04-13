@@ -104,3 +104,41 @@ describe("BankAccountService > 같은 id로의 접근", () => {
     expect(balance2).toBe(20_000_000);
   });
 });
+
+describe("BankAccountService > 다른 id로의 접근", () => {
+  let bankAccountService: BankAccountService;
+
+  beforeEach(() => {
+    const bankAccountList = [
+      {
+        id: 1,
+        balance: 20_000_000,
+      },
+      {
+        id: 2,
+        balance: 0,
+      },
+      {
+        id: 3,
+        balance: 5_000,
+      },
+    ];
+
+    bankAccountService = new BankAccountServiceImpl(
+      new MemoryBankAccountRepository(bankAccountList)
+    );
+  });
+
+  it("다른 id 계좌에 입금이 발생하였을 때, 에러를 반환해서는 안 된다.", async () => {
+    await Promise.all([
+      bankAccountService.deposit(1, 100),
+      bankAccountService.deposit(2, 100),
+    ]);
+
+    const { balance: balance1 } = await bankAccountService.getBalance(1);
+    const { balance: balance2 } = await bankAccountService.getBalance(2);
+
+    expect(balance1).toBe(20_000_100);
+    expect(balance2).toBe(100);
+  });
+});
