@@ -17,8 +17,12 @@ export class MemoryBankAccountRepository implements BankAccountRepository {
     },
   ];
 
+  constructor(bankAccountList?: BankAccount[]) {
+    if (bankAccountList) this.bankAccountList = bankAccountList;
+  }
+
   findById = async (id: number) => {
-    sleep(1000);
+    sleep(50);
     const findItem = this.bankAccountList.find((v) => v.id === id);
     if (!findItem) {
       throw new Error(`bankAccount: ${id}가 존재하지 않습니다.`);
@@ -27,7 +31,13 @@ export class MemoryBankAccountRepository implements BankAccountRepository {
     return { ...findItem };
   };
 
-  update = async (id: number, balance: number) => {
+  updateById = async (id: number, balance: number) => {
+    const result = await this.update(id, balance);
+
+    return result;
+  };
+
+  private update = async (id: number, balance: number) => {
     const findItem = this.bankAccountList.find((v) => v.id === id);
 
     if (!findItem) {

@@ -1,3 +1,4 @@
+import { MemoryBankAccountRepository } from "../../repository/MemoryBankAccountRepository";
 import { MockBankAccountRepository } from "../../repository/MockBankAccountRepository";
 import {
   BankAccountService,
@@ -8,8 +9,23 @@ describe("BankAccountService > getBalance ", () => {
   let bankAccountService: BankAccountService;
 
   beforeEach(() => {
+    const bankAccountList = [
+      {
+        id: 1,
+        balance: 20_000_000,
+      },
+      {
+        id: 2,
+        balance: 0,
+      },
+      {
+        id: 3,
+        balance: 5_000,
+      },
+    ];
+
     bankAccountService = new BankAccountServiceImpl(
-      new MockBankAccountRepository()
+      new MemoryBankAccountRepository(bankAccountList)
     );
   });
 

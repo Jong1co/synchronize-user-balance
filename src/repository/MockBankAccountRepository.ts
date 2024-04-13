@@ -29,7 +29,7 @@ export class MockBankAccountRepository implements BankAccountRepository {
     return { ...findItem };
   };
 
-  update = async (id: number, balance: number) => {
+  updateById = async (id: number, balance: number) => {
     const findItem = this.bankAccountList.find((v) => v.id === id);
 
     if (!findItem) {

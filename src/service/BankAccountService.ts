@@ -27,8 +27,7 @@ export class BankAccountServiceImpl implements BankAccountService {
     if (amount <= 0) throw new Error("잘못된 금액입니다.");
 
     const bankAccount = await this.bankAccountRepository.findById(id);
-    console.log(bankAccount, amount);
-    return await this.bankAccountRepository.update(
+    return await this.bankAccountRepository.updateById(
       id,
       bankAccount.balance + amount
     );
@@ -43,7 +42,7 @@ export class BankAccountServiceImpl implements BankAccountService {
       throw new Error("잔액이 부족합니다.");
     }
 
-    return await this.bankAccountRepository.update(
+    return await this.bankAccountRepository.updateById(
       id,
       bankAccount.balance - amount
     );
