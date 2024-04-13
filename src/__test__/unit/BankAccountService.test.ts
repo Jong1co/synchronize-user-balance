@@ -1,8 +1,8 @@
-import { MockBankAccountRepository } from "../repository/MockBankAccountRepository";
+import { MockBankAccountRepository } from "../../repository/MockBankAccountRepository";
 import {
   BankAccountService,
   BankAccountServiceImpl,
-} from "../service/BankAccountService";
+} from "../../service/BankAccountService";
 
 describe("BankAccountService > getBalance ", () => {
   let bankAccountService: BankAccountService;
