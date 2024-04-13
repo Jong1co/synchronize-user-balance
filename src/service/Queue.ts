@@ -8,24 +8,32 @@ export type BankAccountQueueNode = {
 };
 
 export interface BankAccountServiceQueue {
-  isValid: boolean;
+  isValid: () => void;
   push: (node: BankAccountQueueNode) => void;
   pop: () => () => Promise<BankAccount>;
+  exec: () => void;
 }
 
-export class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
+class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
   private queue: Array<BankAccountQueueNode> = [];
+  private isExec: boolean = false;
 
-  get isValid(): boolean {
+  isValid = () => {
     const depositActions = this.queue.filter(
       (node) => node.action === "deposit"
     );
 
-    return depositActions.length <= 1;
-  }
+    if (depositActions.length > 1) {
+      throw new Error("동시에 입금할 수 없습니다.");
+    }
+  };
 
   push(node: BankAccountQueueNode) {
     this.queue.push(node);
+    if (!this.isExec) {
+      this.isExec = true;
+      this.exec();
+    }
   }
 
   pop() {
@@ -33,10 +41,20 @@ export class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
     return func;
   }
 
+  // 재귀함수 사용
   async exec() {
-    while (this.queue.length > 0) {
-      await this.pop();
-    }
+    const func = this.pop();
+
+    this.isValid();
+
+    func().then((res) => {
+      console.log(res);
+      if (this.queue.length > 0) {
+        this.exec();
+      } else {
+        this.isExec = false;
+      }
+    });
   }
 
   // while문은 동기적인 특성을 갖고 있기 때문에, 아래와 같이 사용 불가능
@@ -46,3 +64,7 @@ export class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
   //   }
   // }
 }
+
+// 싱글톤 패턴으로 추후에 Queue만 갈아끼워주면 가능하도록 ?
+// 이게 맞나,,
+export default new BankAccountServiceQueueImpl();

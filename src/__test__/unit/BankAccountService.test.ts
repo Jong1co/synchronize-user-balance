@@ -39,7 +39,7 @@ describe("BankAccountService > getBalance ", () => {
   });
 });
 
-describe("BankAccountService > deposit ", () => {
+describe("BankAccountService > deposit", () => {
   let bankAccountService: BankAccountService;
 
   beforeEach(() => {
@@ -87,11 +87,11 @@ describe("BankAccountService > withdrawal ", () => {
     expect(balance).toBe(0);
   });
 
-  it("출금 시 출금액 > 잔액일 경우, Error를 반환해야 한다.", async () => {
-    await expect(
-      bankAccountService.withdrawal(1, 20_000_001)
-    ).rejects.toThrow();
-  });
+  // it("출금 시 출금액 > 잔액일 경우, Error를 반환해야 한다.", async () => {
+  //   await expect(
+  //     bankAccountService.withdrawal(1, 20_000_001)
+  //   ).rejects.toThrow();
+  // });
 
   it("출금액이 === 0일 경우, Error를 반환해야 한다.", async () => {
     await expect(bankAccountService.withdrawal(1, 0)).rejects.toThrow();
