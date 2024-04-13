@@ -18,10 +18,14 @@ export class BankAccountServiceImpl implements BankAccountService {
 
   getBalance = async (id: number) => {
     const bankAccount = await this.bankAccountRepository.findById(id);
+    if (!bankAccount) throw new Error("존재하지 않는 유저입니다.");
+
     return bankAccount;
   };
 
   deposit = async (id: number, amount: number) => {
+    if (amount <= 0) throw new Error("잘못된 금액입니다.");
+
     const bankAccount = await this.bankAccountRepository.findById(id);
     console.log(bankAccount, amount);
     return await this.bankAccountRepository.update(
@@ -31,6 +35,8 @@ export class BankAccountServiceImpl implements BankAccountService {
   };
 
   withdrawal = async (id: number, amount: number) => {
+    if (amount <= 0) throw new Error("잘못된 금액입니다.");
+
     const bankAccount = await this.bankAccountRepository.findById(id);
 
     if (bankAccount.balance < amount) {
