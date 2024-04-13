@@ -25,12 +25,16 @@ export class BankAccountServiceImpl implements BankAccountService {
 
   deposit = async (id: number, amount: number) => {
     if (amount <= 0) throw new Error("잘못된 금액입니다.");
+    this.bankAccountRepository.startDeposit(id);
 
     const bankAccount = await this.bankAccountRepository.findById(id);
-    return await this.bankAccountRepository.updateById(
-      id,
-      bankAccount.balance + amount
-    );
+
+    if (this.bankAccountRepository.isLock(id)) {
+      throw new Error("동시에 입금할 수 없습니다.");
+    }
+    return await this.bankAccountRepository
+      .updateById(id, bankAccount.balance + amount)
+      .finally(() => this.bankAccountRepository.endDeposit(id));
   };
 
   withdrawal = async (id: number, amount: number) => {

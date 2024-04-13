@@ -17,6 +17,8 @@ export class MemoryBankAccountRepository implements BankAccountRepository {
     },
   ];
 
+  private lockMap: Record<number, boolean> = {};
+
   constructor(bankAccountList?: BankAccount[]) {
     if (bankAccountList) this.bankAccountList = bankAccountList;
   }
@@ -49,5 +51,17 @@ export class MemoryBankAccountRepository implements BankAccountRepository {
     findItem.balance = balance;
 
     return findItem;
+  };
+
+  startDeposit = (id: number) => {
+    this.lockMap[id] = true;
+  };
+
+  endDeposit = (id: number) => {
+    if (this.lockMap[id]) this.lockMap[id] = false;
+  };
+
+  isLock = (id: number) => {
+    return Boolean(this.lockMap[id]);
   };
 }
