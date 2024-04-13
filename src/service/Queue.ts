@@ -44,7 +44,6 @@ export class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
   async push(node: BankAccountQueueNode) {
     this.queue.push(node);
     this.isValid();
-    console.log("hi");
 
     if (!this.isExec) {
       this.isExec = true;
@@ -62,7 +61,6 @@ export class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
     const { func } = this.queue[0];
 
     await func().then((res) => {
-      console.log(res);
       this.dequeue();
       if (this.queue.length > 0) {
         this.exec();

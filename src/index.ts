@@ -15,9 +15,7 @@ export class App {
 
   async start() {
     await this.bankAccountService.deposit(1, 5000);
-    console.log("wndrks");
     const balance = await this.bankAccountService.getBalance(1);
-    console.log(balance);
   }
 }
 
