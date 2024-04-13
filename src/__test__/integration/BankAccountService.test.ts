@@ -129,6 +129,22 @@ describe("BankAccountService > 다른 id로의 접근", () => {
     );
   });
 
+  it("잔액이 0원인 계좌에서 출금 후 입금 시, 에러를 반환한다.", async () => {
+    await Promise.all([
+      bankAccountService.deposit(1, 100),
+      bankAccountService.deposit(2, 100),
+      bankAccountService.deposit(3, 100),
+    ]);
+
+    const { balance: balance1 } = await bankAccountService.getBalance(1);
+    const { balance: balance2 } = await bankAccountService.getBalance(2);
+    const { balance: balance3 } = await bankAccountService.getBalance(3);
+
+    expect(balance1).toBe(20_000_100);
+    expect(balance2).toBe(100);
+    expect(balance3).toBe(5_100);
+  });
+
   it("다른 id 계좌에 입금이 발생하였을 때, 에러를 반환해서는 안 된다.", async () => {
     await Promise.all([
       bankAccountService.deposit(1, 100),
