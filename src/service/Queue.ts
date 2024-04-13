@@ -9,12 +9,12 @@ export type BankAccountQueueNode = {
 
 export interface BankAccountServiceQueue {
   isValid: () => void;
-  push: (node: BankAccountQueueNode) => void;
-  pop: () => () => Promise<BankAccount>;
+  push: (node: BankAccountQueueNode) => Promise<any>;
+  dequeue: () => () => Promise<BankAccount>;
   exec: () => void;
 }
 
-class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
+export class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
   private queue: Array<BankAccountQueueNode> = [];
   private isExec: boolean = false;
 
@@ -28,27 +28,29 @@ class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
     }
   };
 
-  push(node: BankAccountQueueNode) {
+  async push(node: BankAccountQueueNode) {
     this.queue.push(node);
+    this.isValid();
+    console.log("hi");
+
     if (!this.isExec) {
       this.isExec = true;
-      this.exec();
+      return await this.exec();
     }
   }
 
-  pop() {
+  dequeue() {
     const { func } = this.queue.shift() as BankAccountQueueNode;
     return func;
   }
 
   // 재귀함수 사용
   async exec() {
-    const func = this.pop();
+    const { func } = this.queue[0];
 
-    this.isValid();
-
-    func().then((res) => {
+    await func().then((res) => {
       console.log(res);
+      this.dequeue();
       if (this.queue.length > 0) {
         this.exec();
       } else {

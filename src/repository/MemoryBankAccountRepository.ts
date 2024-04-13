@@ -24,7 +24,7 @@ export class MemoryBankAccountRepository implements BankAccountRepository {
   }
 
   findById = async (id: number) => {
-    sleep(50);
+    // sleep(50);
     const findItem = this.bankAccountList.find((v) => v.id === id);
     if (!findItem) {
       throw new Error(`bankAccount: ${id}가 존재하지 않습니다.`);
