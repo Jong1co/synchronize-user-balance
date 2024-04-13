@@ -39,7 +39,7 @@ export class BankAccountServiceImpl implements BankAccountService {
     };
 
     try {
-      await this.bankAccountServiceQueue.push({ func, action: "deposit" });
+      await this.bankAccountServiceQueue.push({ func, action: "deposit", id });
     } catch (e) {
       throw new Error("");
     }
@@ -65,6 +65,6 @@ export class BankAccountServiceImpl implements BankAccountService {
       return result;
     };
 
-    await this.bankAccountServiceQueue.push({ func, action: "withdrawal" });
+    await this.bankAccountServiceQueue.push({ func, action: "withdrawal", id });
   };
 }

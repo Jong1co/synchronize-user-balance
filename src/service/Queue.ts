@@ -4,6 +4,7 @@ export type BankAccountUpdateAction = "deposit" | "withdrawal";
 
 export type BankAccountQueueNode = {
   func: () => Promise<BankAccount>;
+  id: number;
   action: BankAccountUpdateAction;
 };
 
@@ -19,12 +20,24 @@ export class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
   private isExec: boolean = false;
 
   isValid = () => {
-    const depositActions = this.queue.filter(
-      (node) => node.action === "deposit"
+    const depositActionCountMap = this.queue.reduce((accr, curr) => {
+      if (curr.action !== "deposit") return accr;
+
+      if (accr[curr.id]) {
+        accr[curr.id] += 1;
+      } else {
+        accr[curr.id] = 1;
+      }
+
+      return accr;
+    }, {} as Record<number, number>);
+
+    const isInvalidAction = Object.values(depositActionCountMap).some(
+      (count) => count > 1
     );
 
-    if (depositActions.length > 1) {
-      throw new Error("동시에 입금할 수 없습니다.");
+    if (isInvalidAction) {
+      throw new Error("같은 아이디로 동시에 입금할 수 없습니다.");
     }
   };
 
