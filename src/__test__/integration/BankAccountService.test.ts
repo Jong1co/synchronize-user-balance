@@ -63,35 +63,39 @@ describe("BankAccountService > 같은 id로의 접근", () => {
     expect(balance2).toBe(20_000_000);
   });
 
-  it("입금 요청이 같은 id로 동시에 2개일 경우, 에러를 반환해야 한다.", async () => {
-    await expect(
-      Promise.all([
-        bankAccountService.deposit(1, 100),
-        bankAccountService.deposit(1, 100),
-      ])
-    ).rejects.toThrow();
+  it("입금 요청이 같은 id로 동시에 2개일 경우, 기존과 동일한 값을 반환한다.", async () => {
+    await Promise.all([
+      bankAccountService.deposit(1, 100),
+      bankAccountService.deposit(1, 100),
+    ]);
+
+    const { balance } = await bankAccountService.getBalance(1);
+    expect(balance).toBe(20_000_000);
   });
 
-  it("입금 요청이 같은 id로 동시에 2개 이상 들어올 경우, 에러를 반환해야 한다.", async () => {
-    await expect(
-      Promise.all([
-        bankAccountService.deposit(1, 100),
-        bankAccountService.withdrawal(1, 100),
-        bankAccountService.deposit(1, 100),
-        bankAccountService.withdrawal(1, 100),
-        bankAccountService.deposit(1, 100),
-      ])
-    ).rejects.toThrow();
+  it("입금과 출금 요청이 같은 id로 동시에 여러개 들어올 경우, 출금된 금액만 적용한다.", async () => {
+    await Promise.all([
+      bankAccountService.deposit(1, 100),
+      bankAccountService.deposit(1, 100),
+      bankAccountService.deposit(1, 100),
+      bankAccountService.deposit(1, 100),
+      bankAccountService.withdrawal(1, 100),
+    ]);
+
+    const { balance } = await bankAccountService.getBalance(1);
+    expect(balance).toBe(20_000_000 - 100);
   });
 
-  it("입금 요청이 같은 id로 동시에 3개일 경우, 에러를 반환해야 한다.", async () => {
-    await expect(
-      Promise.all([
-        bankAccountService.deposit(1, 100),
-        bankAccountService.deposit(1, 100),
-        bankAccountService.deposit(1, 100),
-      ])
-    ).rejects.toThrow();
+  it("입금, 입금, 출금을 동시에 호출 시 출금된 금액만 적용한다.", async () => {
+    await Promise.all([
+      bankAccountService.deposit(1, 100),
+      bankAccountService.deposit(1, 100),
+      bankAccountService.withdrawal(1, 100),
+    ]);
+
+    expect((await bankAccountService.getBalance(1)).balance).toBe(
+      20_000_000 - 100
+    );
   });
 
   it("같은 가격을 동시에 입출금 했을 때, 원래 값과 동일해야 한다.", async () => {
