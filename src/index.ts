@@ -14,11 +14,21 @@ export class App {
   }
 
   async start() {
-    await this.bankAccountService.deposit(1, 5000);
+    await Promise.all([
+      this.bankAccountService.deposit(1, 5000),
+      this.bankAccountService.withdrawal(1, 5000),
+      this.bankAccountService.deposit(1, 5000),
+    ]);
+
     const balance = await this.bankAccountService.getBalance(1);
+
+    return balance;
   }
 }
 
 const app = new App();
 
-Promise.all([app.start(), app.start()]);
+(async () => {
+  const result = await app.start();
+  console.log(result);
+})();

@@ -1,4 +1,5 @@
 import { BankAccount } from "../repository/BankAccountRepository";
+import { sleep } from "../utils/sleep";
 
 export type BankAccountUpdateAction = "deposit" | "withdrawal";
 
@@ -9,7 +10,7 @@ export type BankAccountQueueNode = {
 };
 
 export interface BankAccountServiceQueue {
-  isValid: () => void;
+  isValid: (id: number) => void;
   push: (node: BankAccountQueueNode) => Promise<any>;
   dequeue: () => () => Promise<BankAccount>;
   exec: () => void;
@@ -33,21 +34,21 @@ export class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
     }, {} as Record<number, number>);
   };
 
-  isValid = () => {
+  isValid = (id: number) => {
     const depositActionCountMap = this.getDepositActionCount(this.queue);
+    console.log(this.queue);
+    return !(depositActionCountMap[id] > 1);
+    // const isInvalidAction = Object.values(depositActionCountMap).some(
+    //   (count) => count > 1
+    // );
 
-    const isInvalidAction = Object.values(depositActionCountMap).some(
-      (count) => count > 1
-    );
-
-    if (isInvalidAction) {
-      throw new Error("같은 아이디로 동시에 입금할 수 없습니다.");
-    }
+    // if (isInvalidAction) {
+    //   throw new Error("같은 아이디로 동시에 입금할 수 없습니다.");
+    // }
   };
 
   async push(node: BankAccountQueueNode) {
     this.queue.push(node);
-    this.isValid();
 
     if (!this.isExec) {
       this.isExec = true;
@@ -62,7 +63,20 @@ export class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
 
   // 재귀함수 사용
   async exec() {
-    const { func } = this.queue[0];
+    const { func, id } = this.queue[0];
+
+    await sleep(0);
+
+    if (!this.isValid(id)) {
+      this.queue = this.queue.filter(
+        (node) => !(node.id === id && node.action === "deposit")
+      );
+
+      if (this.queue.length > 0) {
+        this.exec();
+      }
+      return;
+    }
 
     await func().then(() => {
       this.dequeue();
