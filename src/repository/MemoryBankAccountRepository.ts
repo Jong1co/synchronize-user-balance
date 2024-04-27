@@ -17,14 +17,11 @@ export class MemoryBankAccountRepository implements BankAccountRepository {
     },
   ];
 
-  private lockMap: Record<number, number> = {};
-
   constructor(bankAccountList?: BankAccount[]) {
     if (bankAccountList) this.bankAccountList = bankAccountList;
   }
 
   findById = async (id: number) => {
-    // sleep(50);
     const findItem = this.bankAccountList.find((v) => v.id === id);
     if (!findItem) {
       throw new Error(`bankAccount: ${id}가 존재하지 않습니다.`);
@@ -46,28 +43,8 @@ export class MemoryBankAccountRepository implements BankAccountRepository {
       throw new Error(`bankAccount: ${id}가 존재하지 않습니다.`);
     }
 
-    // sleep(500);
-
     findItem.balance = balance;
 
     return findItem;
-  };
-
-  startDeposit = (id: number) => {
-    if (this.lockMap[id]) {
-      this.lockMap[id] += 1;
-    } else {
-      this.lockMap[id] = 1;
-    }
-  };
-
-  endDeposit = (id: number) => {
-    if (this.lockMap[id]) {
-      this.lockMap[id] -= 1;
-    }
-  };
-
-  isLock = (id: number) => {
-    return this.lockMap[id] > 1;
   };
 }

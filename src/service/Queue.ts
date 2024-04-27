@@ -60,7 +60,7 @@ export class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
   async exec() {
     const { func } = this.queue[0];
 
-    await func().then((res) => {
+    await func().then(() => {
       this.dequeue();
       if (this.queue.length > 0) {
         this.exec();
