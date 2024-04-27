@@ -61,6 +61,10 @@ export class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
     return func;
   }
 
+  private isInvalidRequest = (node: BankAccountQueueNode, id: number) => {
+    return node.id === id && node.action === "deposit";
+  };
+
   // 재귀함수 사용
   async exec() {
     const { func, id } = this.queue[0];
@@ -68,8 +72,14 @@ export class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
     await sleep(0);
 
     if (!this.isValid(id)) {
+      //유효하지 않은 횟수만큼 콘솔 출력
+      this.queue.forEach((node) => {
+        this.isInvalidRequest(node, id) &&
+          console.log("입금 요청이 동시에 발생했습니다.");
+      });
+
       this.queue = this.queue.filter(
-        (node) => !(node.id === id && node.action === "deposit")
+        (node) => !this.isInvalidRequest(node, id)
       );
 
       if (this.queue.length > 0) {
