@@ -19,8 +19,8 @@ export class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
   private queue: Array<BankAccountQueueNode> = [];
   private isExec: boolean = false;
 
-  isValid = () => {
-    const depositActionCountMap = this.queue.reduce((accr, curr) => {
+  private getDepositActionCount = (queue: Array<BankAccountQueueNode>) => {
+    return queue.reduce((accr, curr) => {
       if (curr.action !== "deposit") return accr;
 
       if (accr[curr.id]) {
@@ -31,6 +31,10 @@ export class BankAccountServiceQueueImpl implements BankAccountServiceQueue {
 
       return accr;
     }, {} as Record<number, number>);
+  };
+
+  isValid = () => {
+    const depositActionCountMap = this.getDepositActionCount(this.queue);
 
     const isInvalidAction = Object.values(depositActionCountMap).some(
       (count) => count > 1
